@@ -1,5 +1,5 @@
 {
-    "name": "lucidity/composer-installer",
+    "name": "lucidity/lucidity-composer-installer",
     "description": "Composer installer for lucidity packages",
     "type": "composer-plugin",
     "license": "MIT",
