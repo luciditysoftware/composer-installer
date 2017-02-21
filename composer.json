@@ -1,5 +1,5 @@
 {
-    "name": "lucidity/lucidity-composer-installer",
+    "name": "luciditysoftware/lucidity-composer-installer",
     "description": "Composer installer for lucidity packages",
     "type": "composer-plugin",
     "license": "MIT",
@@ -18,8 +18,7 @@
         "composer-plugin-api": "^1.0"
     },
     "require-dev": {
-        "composer/composer": "^1.3",
-        "phpunit/phpunit": "^5.7"
+        "composer/composer": "^1.3"
     },
     "extra": {
         "class": "Lucidity\\Composer\\Plugin"
