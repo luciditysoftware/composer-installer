@@ -12,9 +12,9 @@ To setup up your module to be installed using the lucidity-module format, the fo
 
 ```
 {
-	"type": "lucidity-module",
+    "type": "lucidity-module",
     "require": {
-        "lucidity/lucidity-composer-installer": "1.0.0"
+        "luciditysoftware/lucidity-composer-installer": "1.0.0"
      }
 }
 
