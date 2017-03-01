@@ -20,17 +20,13 @@ To setup up your module to be installed using the lucidity-module format, the fo
 
 ```
 
-
 ## Local Development
-To take advantage of symlinking to within your local development environment, you'll need to perform a bit of setup. 
+Out of the box the plugin allows local development. By default, composer-installer will look for matching packages in the directory above your working directory (e.g. /workspace/web would scan the /workspace directory for matching packages).
 
-Add the following environment variable to your .bash_profile (or similar)
+If you wish to use a different directory, you can supply that using the environment variable `COMPOSER_MODULE_DIRECTORY`, either within your .bash_profile or on the cli at runtime. Additionally, you can disable by setting the `COMPOSER_DISABLE_LOCAL_MODULES=true` environment variable.
 
-```
-COMPOSER_ENABLE_LOCAL_MODULES=true
-```
+## Feature Branches
+Feature branches can be specified at runtime. This is useful in situations such as continuous integration / testing where you might want to install dependencies for feature branches. 
 
-By default, composer-installer will look for matching packages in the directory above your working directory (e.g. /workspace/web would scan the /workspace directory for matching packages).
-
-If you wish to use a different directory, you can supply that using the environment variable `COMPOSER_MODULE_DIRECTORY`, either within your .bash_profile or on the cli at runtime.
+The desired feature branch can be specified at runtime using `COMPOSER_FEATURE_BRANCH=feature-branch-name`. The composer-installer plugin will install that version of lucidity-module dependencies where found, or fallback to the locked version in the composer.json
 
