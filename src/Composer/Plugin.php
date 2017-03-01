@@ -62,10 +62,12 @@ class Plugin implements PluginInterface {
             $requires = $package->getRequires();
             $this->io->write(sprintf("<info>Checking for feature branch '%s'</info>", $this->featureBranch));
             foreach ($requires as $key => $require) {
-                if ($this->hasFeatureBranch($require, $featureBranchConstraint)) {
-                    $requires[$key] = new Link($require->getSource(), $require->getTarget(), $featureBranchConstraint, 'requires', $featureBranchConstraint->getPrettyString());
-                }
-                $this->io->write('');
+				if (strpos($require->getTarget(), 'luciditysoftware') !== false) {
+					if ($this->hasFeatureBranch($require, $featureBranchConstraint)) {
+						$requires[$key] = new Link($require->getSource(), $require->getTarget(), $featureBranchConstraint, 'requires', $featureBranchConstraint->getPrettyString());
+					}
+				}
+				$this->io->write('');
             }
             $package->setRequires($requires);
         }
