@@ -43,6 +43,10 @@ class Plugin implements PluginInterface {
             $this->updateFeatureBranch();
         }
 
+        if ($this->$featureBranchFallbacks()) {
+            $this->updateFeatureBranch();
+        }
+
         $module = new ModuleInstaller($this->io, $this->composer, 'lucidity-module', function ($packageName) {
             return 'modules/' . $packageName;
         });
@@ -71,10 +75,6 @@ class Plugin implements PluginInterface {
     }
 
     /* Updating Feature Branch */
-
-    /**
-     *
-     */
     private function updateFeatureBranch() {
         $package = $this->composer->getPackage();
         if ($package->isDev()) {
@@ -86,7 +86,7 @@ class Plugin implements PluginInterface {
                 if ($this->hasFeatureBranch($require, $featureBranchConstraint)) {
                     $requires[$key] = new Link($require->getSource(), $require->getTarget(), $featureBranchConstraint, 'requires', $featureBranchConstraint->getPrettyString());
                 }
-                else {
+				else {
                     $fallbackBranch = $this->getFallbackBranch($require);
                     if ($fallbackBranch !== false) {
                         $fallbackConstraint = new Constraint('=', $this->versionParser->normalize($fallbackBranch));
@@ -101,22 +101,18 @@ class Plugin implements PluginInterface {
         $this->composer->setPackage($package);
     }
     /* Checking Feature Branch repository
-     *
-     * @return Boolean
-     */
-
-    /* Checking that is Feature Branch or not*/
+    *
+    * @return Boolean
+    */
     private function isFeatureBranchRepository(Link $require){
         return in_array($require->getTarget(), $this->featureBranchRepositories);
     }
 
     /* Checking fature  Branch  fallback repository
-     *
-     * @return Boolean
-     */
-
-    /* Checking that is Feature branch fallback Branch or not*/
-    private function hasFallbackBranch(Link $require){
+    *
+    *@return Boolean
+    */
+	private function hasFallbackBranch(Link $require){
         return isset($this->featureBranchFallbacks[$require->getTarget()]);
     }
 
@@ -125,7 +121,6 @@ class Plugin implements PluginInterface {
      * @return Boolean
      */
     private function hasFeatureBranch(Link $require, Constraint $requiredConstraint) {
-
         if ($this->isFeatureBranchRepository($require)) {
             $this->io->write(sprintf('<info>%s</info>', $require->getTarget()), false);
             $package = $this->composer->getRepositoryManager()->findPackage($require->getTarget(), $requiredConstraint);
@@ -139,8 +134,7 @@ class Plugin implements PluginInterface {
         return false;
     }
 
-    private function getFallbackBranch(Link $require)
-    {
+    private function getFallbackBranch(Link $require){
         if ($this->isFeatureBranchRepository($require)) {
             if ($this->hasFallbackBranch($require)) {
                 $fallbackBranch = $this->featureBranchFallbacks[$require->getTarget()];
