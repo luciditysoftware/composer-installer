@@ -43,7 +43,7 @@ class Plugin implements PluginInterface {
             $this->updateFeatureBranch();
         }
 
-        if ($this->$featureBranchFallbacks()) {
+        if ($this->featureBranchFallbacks()) {
             $this->updateFeatureBranch();
         }
 
@@ -69,7 +69,7 @@ class Plugin implements PluginInterface {
      *
      * @return Boolean
      */
-    private function checkFeatureBranch() {
+    private function featureBranchFallbacks() {
         $this->featureBranch = getenv(self::FEATURE_BRANCH_FALLBACK) ? getenv(self::FEATURE_BRANCH_FALLBACK) : null;
         return !is_null($this->featureBranch);
     }
