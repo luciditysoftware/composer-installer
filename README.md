@@ -28,5 +28,28 @@ If you wish to use a different directory, you can supply that using the environm
 ## Feature Branches
 Feature branches can be specified at runtime. This is useful in situations such as continuous integration / testing where you might want to install dependencies for feature branches. 
 
-The desired feature branch can be specified at runtime using `COMPOSER_FEATURE_BRANCH=feature-branch-name`. The composer-installer plugin will install that version of lucidity-module dependencies where found, or fallback to the locked version in the composer.json
+The desired feature branch can be specified at runtime using `COMPOSER_FEATURE_BRANCH=feature-branch-name`. The composer-installer plugin will install that version of lucidity-module dependencies where found, or fallback to the locked version in the composer.json.
+To enable the feature branch functionality, the applicable dependencies must be specified within the `"extra"` section of the composer.json file, under `feature-branch-repositories`
 
+A fallback branch can be specified using the env variable `COMPOSER_FEATURE_BRANCH_FALLBACK=dev-fallback`. Additionally, fallback branches can also be specified within the `"extra"` section of the composer.json file under `feature-branch-fallbacks`. 
+
+### Example composer.json
+
+
+```
+{
+    "extra": {
+        "feature-branch-repositories": [
+            "luciditysoftware/module-a",
+            "luciditysoftware/module-b",
+            "luciditysoftware/module-c"
+        ],
+        "feature-branch-fallbacks": {
+            "*": "dev-master", //Wildcard to set default fallback branch
+            "luciditysoftware/module-c": "dev-different-branch"
+        }
+      
+    }
+}
+
+```
