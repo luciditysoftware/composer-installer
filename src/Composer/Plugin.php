@@ -27,7 +27,6 @@ class Plugin implements PluginInterface
 
     protected $featureBranchFallbacks;
 
-    protected $globalFallbackBranch;
 
     /**
      * Apply plugin modifications to Composer
@@ -44,7 +43,8 @@ class Plugin implements PluginInterface
         $this->featureBranch = getenv(self::FEATURE_BRANCH) ? getenv(self::FEATURE_BRANCH) : null;
         $this->featureBranchRepositories = isset($extra['feature-branch-repositories']) ? $extra['feature-branch-repositories'] : [];
         $this->featureBranchFallbacks = isset($extra['feature-branch-fallbacks']) ? $extra['feature-branch-fallbacks'] : [];
-        $this->globalFallbackBranch = getenv(self::FEATURE_BRANCH_FALLBACK) ? getenv(self::FEATURE_BRANCH_FALLBACK) : null;
+        $this->featureBranchFallbacks['*'] = isset($this->featureBranchFallbacks['*']) ?  $this->featureBranchFallbacks['*'] : false;
+        $this->featureBranchFallbacks['*'] = getenv(self::FEATURE_BRANCH_FALLBACK) ?:  $this->featureBranchFallbacks['*'];
         $this->updateFeatureBranchDependencies();
         $this->registerModuleInstaller();
     }
@@ -63,11 +63,11 @@ class Plugin implements PluginInterface
     private function updateFeatureBranchDependencies()
     {
         $package = $this->composer->getPackage();
-        if ($package->isDev()) {
+        if ($package->isDev() && $this->featureBranch) {
             $featureBranchConstraint = new Constraint('=', $this->versionParser->normalize($this->featureBranch));
             $featureBranchConstraint->setPrettyString($package->getVersion());
             $requires = $package->getRequires();
-            $this->io->write(sprintf("<info>Checking for feature branch '%s'</info>", $this->featureBranch));
+            $this->io->write(sprintf("<info>Checking for feature branch '%s' on:</info>\n", $this->featureBranch));
             foreach ($requires as $key => $require) {
                 if ($this->isFeatureBranchRepository($require)) {
                     if ($this->hasFeatureBranch($require, $featureBranchConstraint)) {
@@ -90,17 +90,12 @@ class Plugin implements PluginInterface
                         );
                     }
                 }
-                $this->io->write('');
             }
             $package->setRequires($requires);
         }
         $this->composer->setPackage($package);
     }
 
-    /* Checking Feature Branch repository
-    *
-    * @return Boolean
-    */
     private function isFeatureBranchRepository(Link $require)
     {
         return in_array($require->getTarget(), $this->featureBranchRepositories);
@@ -109,22 +104,21 @@ class Plugin implements PluginInterface
     private function hasFeatureBranch(Link $require, Constraint $requiredConstraint)
     {
         if ($this->isFeatureBranchRepository($require)) {
-            $this->io->write(sprintf('<info>%s</info>', $require->getTarget()), false);
+            $this->io->write(sprintf('  - <info>%s</info>', $require->getTarget()), false);
             $package = $this->composer->getRepositoryManager()->findPackage($require->getTarget(), $requiredConstraint);
             if ($package) {
-                $this->io->write("  - <info>Switching to branch</info>", false);
+                $this->io->write(" … <info>switching to branch</info>");
                 return true;
             } else {
-                $this->io->write("  - <warning>Branch not found</warning>", false);
+                $this->io->write(" … <warning>branch not found</warning>");
             }
-            $this->io->write('');
         }
         return false;
     }
 
     private function getFallbackBranch(Link $require)
     {
-        $fallbackBranch = isset($this->featureBranchFallbacks[$require->getTarget()]) ? $this->featureBranchFallbacks[$require->getTarget()] : $this->globalFallbackBranch;
+        $fallbackBranch = isset($this->featureBranchFallbacks[$require->getTarget()]) ? $this->featureBranchFallbacks[$require->getTarget()] : $this->featureBranchFallbacks['*'];
         if ($this->isFeatureBranchRepository($require) && $fallbackBranch) {
             $this->io->write(sprintf("  - <info>falling back to %s</info>", $fallbackBranch), false);
             $this->io->write('');
