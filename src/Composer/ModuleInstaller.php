@@ -112,7 +112,7 @@ class ModuleInstaller extends LibraryInstaller
         if ($this->localPackageExists($package)) {
             $this->filesystem->removeDirectory($this->getInstallPath($package));
             $this->filesystem->ensureSymlinkExists($this->localPackagePath($package), $this->getInstallPath($package));
-            $this->io->writeError(' - Linking <info>' . $package->getName() . '</info> from <info>' . $this->localPackagePath($package) . '</info>');
+            $this->io->writeError('  - Linking <info>' . $package->getName() . '</info> from <info>' . $this->localPackagePath($package) . '</info>');
             if (!$repo->hasPackage($package)) {
                 $repo->addPackage(clone $package);
             }
