@@ -26,10 +26,10 @@ Out of the box the plugin allows local development. By default, composer-install
 If you wish to use a different directory, you can supply that using the environment variable `COMPOSER_MODULE_DIRECTORY`, either within your .bash_profile or on the cli at runtime. Additionally, you can disable by setting the `COMPOSER_DISABLE_LOCAL_MODULES=true` environment variable.
 
 
-### Installation Artifacts
-If you need to easily access a list of locally installed modules, a JSON artifact can be generated for you. This can be useful for integrating local branches into CI workflows
+### Installation Manifest
+If you need to easily access a list of locally installed modules, a JSON manifest can be generated for you. This can be useful for integrating local branches into CI workflows
 
-If you supply the environment variable `COMPOSER_INSTALL_ARTIFACT_PATH` with a writeable file path, a JSON file in the following format will be generated for you. 
+If you supply the environment variable `COMPOSER_INSTALL_MANIFEST_PATH` with a writeable file path, a JSON file in the following format will be generated for you. 
 
 ```
 {

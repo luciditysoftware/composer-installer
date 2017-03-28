@@ -14,7 +14,7 @@ class Plugin implements PluginInterface
     const DISABLE_LOCAL_MODULES_ENV = 'COMPOSER_DISABLE_LOCAL_MODULES';
     const FEATURE_BRANCH = 'COMPOSER_FEATURE_BRANCH';
     const FEATURE_BRANCH_FALLBACK = 'COMPOSER_FEATURE_BRANCH_FALLBACK';
-    const INSTALL_ARTIFACT_PATH = 'COMPOSER_INSTALL_ARTIFACT_PATH';
+    const INSTALL_MANIFEST_PATH = 'COMPOSER_INSTALL_MANIFEST_PATH';
 
     protected $versionParser;
 
@@ -61,7 +61,7 @@ class Plugin implements PluginInterface
         $enableLocalModules = $this->getConfig(self::DISABLE_LOCAL_MODULES_ENV, false) === false;
         $module->setLocalModuleDirectory($this->getConfig(self::MODULE_DIRECTORY_ENV))
             ->setLocalInstallsAllowed($enableLocalModules)
-            ->setInstallArtifactPath($this->getConfig(self::INSTALL_ARTIFACT_PATH));
+            ->setInstallManifestPath($this->getConfig(self::INSTALL_MANIFEST_PATH));
         $this->composer
             ->getInstallationManager()
             ->addInstaller($module);
