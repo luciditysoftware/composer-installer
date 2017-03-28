@@ -41,6 +41,11 @@ class ModuleInstaller extends LibraryInstaller
     protected $composerLoader;
 
     /**
+     * @var string|null
+     */
+    protected $installArtifactPath = null;
+
+    /**
      * ModuleInstaller constructor.
      *
      * @param IOInterface $io
@@ -84,6 +89,18 @@ class ModuleInstaller extends LibraryInstaller
     }
 
     /**
+     * @param $artifactPath
+     *
+     * @return $this
+     */
+    public function setInstallArtifactPath($artifactPath)
+    {
+        $this->installArtifactPath = $artifactPath;
+        file_put_contents($this->installArtifactPath, '{}');
+        return $this;
+    }
+
+    /**
      * @param string $packageType
      *
      * @return bool
@@ -112,6 +129,7 @@ class ModuleInstaller extends LibraryInstaller
         if ($this->localPackageExists($package)) {
             $this->filesystem->removeDirectory($this->getInstallPath($package));
             $this->filesystem->ensureSymlinkExists($this->localPackagePath($package), $this->getInstallPath($package));
+            $this->writeLocalPackageArtifact($package->getName(), $this->localPackagePath($package), $this->getInstallPath($package));
             $this->io->writeError('  - Linking <info>' . $package->getName() . '</info> from <info>' . $this->localPackagePath($package) . '</info>');
             if (!$repo->hasPackage($package)) {
                 $repo->addPackage(clone $package);
@@ -230,5 +248,19 @@ class ModuleInstaller extends LibraryInstaller
             return $this->composerLoader->load($composerJson);
         }
         return new Package('', '', '0.0.1');
+    }
+
+    /**
+     * @param $packageName
+     * @param $localPackagePath
+     * @param $installPath
+     */
+    private function writeLocalPackageArtifact($packageName, $localPackagePath, $installPath)
+    {
+        if (file_exists($this->installArtifactPath)) {
+            $packages = json_decode(file_get_contents($this->installArtifactPath), true);
+            $packages[$packageName] = ['local' => $localPackagePath, 'install' => $installPath];
+            file_put_contents($this->installArtifactPath, json_encode($packages));
+        }
     }
 }
