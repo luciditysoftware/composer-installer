@@ -96,7 +96,10 @@ class ModuleInstaller extends LibraryInstaller
     public function setInstallArtifactPath($artifactPath)
     {
         $this->installArtifactPath = $artifactPath;
-        file_put_contents($this->installArtifactPath, '{}');
+        if ($this->installArtifactPath) {
+            file_put_contents($this->installArtifactPath, '{}');
+        }
+
         return $this;
     }
 
@@ -257,10 +260,10 @@ class ModuleInstaller extends LibraryInstaller
      */
     private function writeLocalPackageArtifact($packageName, $localPackagePath, $installPath)
     {
-        if (file_exists($this->installArtifactPath)) {
+        if ($this->installArtifactPath && file_exists($this->installArtifactPath)) {
             $packages = json_decode(file_get_contents($this->installArtifactPath), true);
             $packages[$packageName] = ['local' => $localPackagePath, 'install' => $installPath];
-            file_put_contents($this->installArtifactPath, json_encode($packages));
+            file_put_contents($this->installArtifactPath, json_encode($packages, JSON_PRETTY_PRINT));
         }
     }
 }
