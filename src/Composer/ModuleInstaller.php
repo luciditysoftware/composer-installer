@@ -43,7 +43,7 @@ class ModuleInstaller extends LibraryInstaller
     /**
      * @var string|null
      */
-    protected $installArtifactPath = null;
+    protected $installManifestPath = null;
 
     /**
      * ModuleInstaller constructor.
@@ -93,11 +93,11 @@ class ModuleInstaller extends LibraryInstaller
      *
      * @return $this
      */
-    public function setInstallArtifactPath($artifactPath)
+    public function setInstallManifestPath($artifactPath)
     {
-        $this->installArtifactPath = $artifactPath;
-        if ($this->installArtifactPath) {
-            file_put_contents($this->installArtifactPath, '{}');
+        $this->installManifestPath = $artifactPath;
+        if ($this->installManifestPath) {
+            file_put_contents($this->installManifestPath, '{}');
         }
 
         return $this;
@@ -132,7 +132,7 @@ class ModuleInstaller extends LibraryInstaller
         if ($this->localPackageExists($package)) {
             $this->filesystem->removeDirectory($this->getInstallPath($package));
             $this->filesystem->ensureSymlinkExists($this->localPackagePath($package), $this->getInstallPath($package));
-            $this->writeLocalPackageArtifact($package->getName(), $this->localPackagePath($package), $this->getInstallPath($package));
+            $this->writeLocalPackageManifest($package->getName(), $this->localPackagePath($package), $this->getInstallPath($package));
             $this->io->writeError('  - Linking <info>' . $package->getName() . '</info> from <info>' . $this->localPackagePath($package) . '</info>');
             if (!$repo->hasPackage($package)) {
                 $repo->addPackage(clone $package);
@@ -165,7 +165,8 @@ class ModuleInstaller extends LibraryInstaller
     public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         if ($this->localPackageExists($package)) {
-            return $this->localPackageInstalled($package);
+            //Always relink local packages to ensure
+            return false;
         }
         return parent::isInstalled($repo, $package);
     }
@@ -258,12 +259,12 @@ class ModuleInstaller extends LibraryInstaller
      * @param $localPackagePath
      * @param $installPath
      */
-    private function writeLocalPackageArtifact($packageName, $localPackagePath, $installPath)
+    private function writeLocalPackageManifest($packageName, $localPackagePath, $installPath)
     {
-        if ($this->installArtifactPath && file_exists($this->installArtifactPath)) {
-            $packages = json_decode(file_get_contents($this->installArtifactPath), true);
+        if ($this->installManifestPath && file_exists($this->installManifestPath)) {
+            $packages = json_decode(file_get_contents($this->installManifestPath), true);
             $packages[$packageName] = ['local' => $localPackagePath, 'install' => $installPath];
-            file_put_contents($this->installArtifactPath, json_encode($packages, JSON_PRETTY_PRINT));
+            file_put_contents($this->installManifestPath, json_encode($packages, JSON_PRETTY_PRINT));
         }
     }
 }
