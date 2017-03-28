@@ -32,6 +32,7 @@ class Plugin implements PluginInterface
 
 
 
+
     /**
      * Apply plugin modifications to Composer
      *
