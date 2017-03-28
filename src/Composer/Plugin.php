@@ -14,6 +14,7 @@ class Plugin implements PluginInterface
     const DISABLE_LOCAL_MODULES_ENV = 'COMPOSER_DISABLE_LOCAL_MODULES';
     const FEATURE_BRANCH = 'COMPOSER_FEATURE_BRANCH';
     const FEATURE_BRANCH_FALLBACK = 'COMPOSER_FEATURE_BRANCH_FALLBACK';
+    const INSTALL_ARTIFACT_PATH = 'COMPOSER_INSTALL_ARTIFACT_PATH';
 
     protected $versionParser;
 
@@ -28,6 +29,7 @@ class Plugin implements PluginInterface
     protected $featureBranchFallbacks;
 
 
+
     /**
      * Apply plugin modifications to Composer
      *
@@ -40,11 +42,11 @@ class Plugin implements PluginInterface
         $this->composer = $composer;
         $this->io = $io;
         $extra = $this->composer->getPackage()->getExtra();
-        $this->featureBranch = getenv(self::FEATURE_BRANCH) ? getenv(self::FEATURE_BRANCH) : null;
+        $this->featureBranch = getenv(self::FEATURE_BRANCH) ?: null;
         $this->featureBranchRepositories = isset($extra['feature-branch-repositories']) ? $extra['feature-branch-repositories'] : [];
         $this->featureBranchFallbacks = isset($extra['feature-branch-fallbacks']) ? $extra['feature-branch-fallbacks'] : [];
-        $this->featureBranchFallbacks['*'] = isset($this->featureBranchFallbacks['*']) ?  $this->featureBranchFallbacks['*'] : false;
-        $this->featureBranchFallbacks['*'] = getenv(self::FEATURE_BRANCH_FALLBACK) ?:  $this->featureBranchFallbacks['*'];
+        $this->featureBranchFallbacks['*'] = isset($this->featureBranchFallbacks['*']) ? $this->featureBranchFallbacks['*'] : false;
+        $this->featureBranchFallbacks['*'] = getenv(self::FEATURE_BRANCH_FALLBACK) ?: $this->featureBranchFallbacks['*'];
         $this->updateFeatureBranchDependencies();
         $this->registerModuleInstaller();
     }
@@ -56,8 +58,11 @@ class Plugin implements PluginInterface
         });
         $enableLocalModules = getenv(self::DISABLE_LOCAL_MODULES_ENV) === false;
         $module->setLocalModuleDirectory(getenv(self::MODULE_DIRECTORY_ENV) ?: null)
-            ->setLocalInstallsAllowed($enableLocalModules);
-        $this->composer->getInstallationManager()->addInstaller($module);
+            ->setLocalInstallsAllowed($enableLocalModules)
+            ->setInstallArtifactPath(getenv(self::INSTALL_ARTIFACT_PATH) ?: null);
+        $this->composer
+            ->getInstallationManager()
+            ->addInstaller($module);
     }
 
     private function updateFeatureBranchDependencies()
